@@ -1,5 +1,12 @@
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class SettlementPrecisionTest{
     public static void main(String[] args){
+        testEncryption();
+        testEncryptedTransactionStorage();
         testValidation();
         testBalanceAccess();
         testSettlement();
@@ -8,6 +15,68 @@ public class SettlementPrecisionTest{
         testLargeBalancePrecision();
         testEmptyAndRepeatedSettlement();
         System.out.println("All settlement tests passed.");
+    }
+
+    private static void testEncryption(){
+        EncryptionUtil encryption = new EncryptionUtil();
+        byte[] first = encryption.encrypt("0,1,500000");
+        byte[] second = encryption.encrypt("0,1,500000");
+
+        if(!encryption.decrypt(first).equals("0,1,500000")){
+            throw new AssertionError("Encrypted text did not decrypt correctly.");
+        }
+
+        if(Arrays.equals(first, second)){
+            throw new AssertionError("Each encryption must use a fresh IV.");
+        }
+
+        first[first.length - 1] ^= 1;
+        expectIllegalArgument(() -> encryption.decrypt(first), "modified encrypted data");
+    }
+
+    private static void testEncryptedTransactionStorage(){
+        BankManager manager = new BankManager();
+        manager.addBank("Bank A", 100);
+        manager.addBank("Bank B", 100);
+        manager.addTransaction("Bank A", "Bank B", 25.50);
+
+        ArrayList<?> storedTransactions;
+
+        try{
+            Field field = BankManager.class.getDeclaredField("encryptedTransactions");
+            field.setAccessible(true);
+            storedTransactions = (ArrayList<?>) field.get(manager);
+        }catch(ReflectiveOperationException e){
+            throw new AssertionError("BankManager should store encrypted transactions.", e);
+        }
+
+        if(storedTransactions.size() != 1 || !(storedTransactions.get(0) instanceof byte[])){
+            throw new AssertionError("BankManager should store transaction ciphertext.");
+        }
+
+        byte[] encryptedData = (byte[]) storedTransactions.get(0);
+        byte[] plaintext = "0,1,2550".getBytes(StandardCharsets.UTF_8);
+
+        if(Arrays.equals(encryptedData, plaintext)){
+            throw new AssertionError("Stored transaction data should not contain plaintext details.");
+        }
+
+        Transaction transaction = manager.getTransactions().get(0);
+        if(!transaction.getSender().getName().equals("Bank A")
+                || !transaction.getReceiver().getName().equals("Bank B")
+                || transaction.getAmount() != 25.50){
+            throw new AssertionError("Encrypted transaction was not reconstructed correctly.");
+        }
+
+        encryptedData[encryptedData.length - 1] ^= 1;
+        expectIllegalArgument(() -> manager.getTransactions(), "corrupted stored transaction");
+        expectIllegalArgument(() -> new NetSettlement().settle(manager), "settlement with corrupted transaction");
+        assertClose(100, manager.findBank("Bank A").getBalance(), "unchanged corrupted sender balance");
+        assertClose(100, manager.findBank("Bank B").getBalance(), "unchanged corrupted receiver balance");
+
+        if(storedTransactions.size() != 1){
+            throw new AssertionError("Corrupted transactions should not be cleared.");
+        }
     }
 
     private static void testBalanceAccess(){
