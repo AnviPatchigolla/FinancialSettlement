@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Settlement System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <div>
+                <p class="eyebrow">Privacy-preserving settlement</p>
+                <h1>Financial Settlement System</h1>
+                <p class="intro">Manage banks, record obligations, and review multilateral net settlement from one workspace.</p>
+            </div>
+            <span id="backend-status" class="status-badge">Backend offline</span>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="card" aria-labelledby="bank-title">
+            <div class="section-heading">
+                <span class="section-number">01</span>
+                <div>
+                    <p class="section-label">Registry</p>
+                    <h2 id="bank-title">Bank Management</h2>
+                </div>
+            </div>
+
+            <form id="bank-form">
+                <div class="form-grid">
+                    <label>
+                        Bank name
+                        <input id="bank-name" type="text" placeholder="e.g. Bank A" required>
+                    </label>
+                    <label>
+                        Initial balance
+                        <input id="bank-balance" type="number" min="0" step="0.01" placeholder="0.00" required>
+                    </label>
+                </div>
+                <button type="submit">Add Bank</button>
+            </form>
+
+            <p id="bank-message" class="form-message" aria-live="polite"></p>
+
+            <div class="display-block">
+                <h3>Registered banks</h3>
+                <ul id="bank-list" class="simple-list"></ul>
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="transaction-title">
+            <div class="section-heading">
+                <span class="section-number">02</span>
+                <div>
+                    <p class="section-label">Obligations</p>
+                    <h2 id="transaction-title">Transaction Management</h2>
+                </div>
+            </div>
+
+            <form id="transaction-form">
+                <div class="form-grid three-fields">
+                    <label>
+                        Sender bank
+                        <select id="sender-bank" required></select>
+                    </label>
+                    <label>
+                        Receiver bank
+                        <select id="receiver-bank" required></select>
+                    </label>
+                    <label>
+                        Amount
+                        <input id="transaction-amount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+                    </label>
+                </div>
+                <button type="submit">Add Transaction</button>
+            </form>
+
+            <p id="transaction-message" class="form-message" aria-live="polite"></p>
+
+            <div class="display-block">
+                <h3>Pending transactions</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sender</th>
+                                <th>Receiver</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="card settlement-card" aria-labelledby="settlement-title">
+            <div class="settlement-heading">
+                <div class="section-heading">
+                    <span class="section-number">03</span>
+                    <div>
+                        <p class="section-label">Netting</p>
+                        <h2 id="settlement-title">Multilateral Settlement</h2>
+                    </div>
+                </div>
+                <button id="settlement-button" type="button">Run Settlement</button>
+            </div>
+
+            <p id="settlement-message" class="form-message" aria-live="polite"></p>
+
+            <div class="results-grid">
+                <div class="result-panel">
+                    <h3>Net positions</h3>
+                    <ul id="net-position-list" class="simple-list"></ul>
+                </div>
+                <div class="result-panel">
+                    <h3>Final transfers</h3>
+                    <ul id="transfer-list" class="simple-list"></ul>
+                </div>
+                <div class="result-panel totals-panel">
+                    <h3>Transfer totals</h3>
+                    <dl>
+                        <div>
+                            <dt>Before netting</dt>
+                            <dd id="total-before">Not calculated</dd>
+                        </div>
+                        <div>
+                            <dt>After netting</dt>
+                            <dd id="total-after">Not calculated</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+        <section class="summary-card" aria-labelledby="summary-title">
+            <div>
+                <p class="section-label">04 &middot; Settlement Summary</p>
+                <h2 id="summary-title">Amount reduction</h2>
+                <p>Percentage saved by replacing gross obligations with net transfers.</p>
+            </div>
+            <div class="summary-value" id="reduction-percentage">Not calculated</div>
+        </section>
+    </main>
+
+    <footer>
+        Data is stored in memory and resets when the Java server stops.
+    </footer>
+</body>
+</html>
