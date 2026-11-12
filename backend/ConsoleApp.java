@@ -11,10 +11,11 @@ public class ConsoleApp{
             System.out.println("\n===== BANK SETTLEMENT SYSTEM =====\n");
             System.out.println("1. Add Bank");
             System.out.println("2. View Banks");
-            System.out.println("3. Add Transaction");
-            System.out.println("4. View Transactions");
-            System.out.println("5. Run Settlement");
-            System.out.println("6. Exit");
+            System.out.println("3. View Bank Balances");
+            System.out.println("4. Add Transaction");
+            System.out.println("5. View Transactions");
+            System.out.println("6. Run Settlement");
+            System.out.println("7. Exit");
             System.out.print("Choose an option: ");
 
             try{
@@ -45,6 +46,20 @@ public class ConsoleApp{
                         break;
 
                     case 3:
+                        ArrayList<Bank> balanceBanks = manager.getBanks();
+
+                        if(balanceBanks.isEmpty()){
+                            System.out.println("No banks registered.");
+                        }else{
+                            System.out.println("Bank balances:");
+
+                            for(Bank bank : balanceBanks){
+                                System.out.printf("%s: %.2f%n", bank.getName(), bank.getBalance());
+                            }
+                        }
+                        break;
+
+                    case 4:
                         System.out.print("Enter sender bank: ");
                         String senderName = scanner.nextLine();
                         System.out.print("Enter receiver bank: ");
@@ -55,7 +70,7 @@ public class ConsoleApp{
                         System.out.println("Transaction added successfully.");
                         break;
 
-                    case 4:
+                    case 5:
                         ArrayList<Transaction> transactions = manager.getTransactions();
 
                         if(transactions.isEmpty()){
@@ -64,24 +79,24 @@ public class ConsoleApp{
                             System.out.println("Pending transactions:");
 
                             for(Transaction transaction : transactions){
-                                System.out.println(transaction.getSender().getName() + " pays "
-                                        + transaction.getReceiver().getName() + ": " + transaction.getAmount());
+                                System.out.printf("%s pays %s: %.2f%n", transaction.getSender().getName(),
+                                        transaction.getReceiver().getName(), transaction.getAmount());
                             }
                         }
                         break;
 
-                    case 5:
+                    case 6:
                         Settlement settlement = new NetSettlement();
                         settlement.settle(manager);
                         break;
 
-                    case 6:
+                    case 7:
                         running = false;
                         System.out.println("Program closed.");
                         break;
 
                     default:
-                        System.out.println("Error: Choose a number from 1 to 6.");
+                        System.out.println("Error: Choose a number from 1 to 7.");
                 }
             }catch(NumberFormatException e){
                 System.out.println("Error: Enter a valid number.");

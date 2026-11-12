@@ -84,7 +84,7 @@ public class NetSettlement extends Settlement{
             remainingPositions.add(netPosition);
             localBankNames.add(bank.getName());
             localNetAmounts.add(netPosition);
-            System.out.println(bank.getName() + ": " + netPosition);
+            System.out.printf("%s: %.2f%n", bank.getName(), netPosition);
         }
 
         double netPositionSum = 0.0;
@@ -195,12 +195,13 @@ public class NetSettlement extends Settlement{
         System.out.println("Final transfers:");
 
         for(int transferIndex = 0; transferIndex < transferAmounts.size(); transferIndex++){
-            System.out.println(transferSenders.get(transferIndex) + " pays " + transferReceivers.get(transferIndex)
-                    + ": " + transferAmounts.get(transferIndex));
+            System.out.printf("%s pays %s: %.2f%n", transferSenders.get(transferIndex),
+                    transferReceivers.get(transferIndex), transferAmounts.get(transferIndex));
         }
 
-        System.out.println("Total before netting: " + totalBefore);
-        System.out.println("Total after netting: " + totalAfter);
+        System.out.printf("Total before netting: %.2f%n", totalBefore);
+        System.out.printf("Total after netting: %.2f%n", totalAfter);
+        System.out.printf("Reduction percentage: %.2f%%%n", reductionPercentage);
 
         manager.clearTransactions();
     }

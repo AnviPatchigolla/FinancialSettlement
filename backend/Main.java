@@ -13,8 +13,8 @@ public class Main{
         System.out.println("Transactions before settlement:");
 
         for(Transaction transaction : manager.getTransactions()){
-            System.out.println(transaction.getSender().getName() + " pays "
-                    + transaction.getReceiver().getName() + ": " + transaction.getAmount());
+            System.out.printf("%s pays %s: %.2f%n", transaction.getSender().getName(),
+                    transaction.getReceiver().getName(), transaction.getAmount());
         }
 
         Bank bankA = manager.findBank("Bank A");
@@ -26,14 +26,10 @@ public class Main{
         System.out.println("\nFirst settlement:");
         settlement.settle(manager);
 
-        boolean bankABalanceCorrect = bankA.canPay(7000) && !bankA.canPay(7000.01);
-        boolean bankBBalanceCorrect = bankB.canPay(10000) && !bankB.canPay(10000.01);
-        boolean bankCBalanceCorrect = bankC.canPay(13000) && !bankC.canPay(13000.01);
-
-        System.out.println("Final balance checks:");
-        System.out.println("Bank A = 7000: " + bankABalanceCorrect);
-        System.out.println("Bank B = 10000: " + bankBBalanceCorrect);
-        System.out.println("Bank C = 13000: " + bankCBalanceCorrect);
+        System.out.println("Final balances:");
+        System.out.printf("Bank A: %.2f%n", bankA.getBalance());
+        System.out.printf("Bank B: %.2f%n", bankB.getBalance());
+        System.out.printf("Bank C: %.2f%n", bankC.getBalance());
 
         System.out.println("\nSecond settlement:");
         settlement.settle(manager);
